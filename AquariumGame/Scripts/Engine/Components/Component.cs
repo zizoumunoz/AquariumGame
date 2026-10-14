@@ -23,5 +23,10 @@ namespace AquariumGame.Scripts.Engine.Components
         /// Update is called every frame this component is available
         /// </summary>
         public virtual void Update(){}
+
+        /// <summary>
+        /// Destroy is called the last frame this component is available
+        /// </summary>
+        public virtual void Destroy(){}
     }
 }

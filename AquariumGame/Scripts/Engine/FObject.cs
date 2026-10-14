@@ -17,6 +17,7 @@ namespace AquariumGame.Scripts.Engine
         /// If this object is the root object, the parent will be itself
         /// </summary>
         public FObject parent;
+        public List<FObject> children = [];
         /// <summary>
         /// The Transform component of this FObjects
         /// </summary>
@@ -24,7 +25,7 @@ namespace AquariumGame.Scripts.Engine
         /// <summary>
         /// The list of components of this FObjects
         /// </summary>
-        private List<Component> components = [];
+        public List<Component> components { get; private set; } = [];
 
         /// <summary>
         /// Returns the component of type T from this object
