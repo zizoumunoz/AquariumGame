@@ -4,6 +4,7 @@ using SFML.System;
 /// <summary>
 /// Represents a fish in the aquarium game, with attributes for size, hunger, happiness, and movement.
 /// </summary>
+
 public class Fish
 {
     private static readonly Random random = new();
