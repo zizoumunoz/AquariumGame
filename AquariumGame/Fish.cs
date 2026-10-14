@@ -1,203 +1,223 @@
-﻿using SFML.Graphics;
+﻿using AquariumGame.Scripts.Engine.Components;
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-/// <summary>
-/// Represents a fish in the aquarium game, with attributes for size, hunger, happiness, and movement.
-/// </summary>
-
-public class Fish : Component
+namespace AquariumGame
 {
-    private static readonly Random random = new();
 
     /// <summary>
-    /// Attributes of the Fih
+    /// Represents a fish in the aquarium game, with attributes for size, hunger, happiness, and movement.
     /// </summary>
-    public float Size { get; private set; } = 1f;
-    public float Hunger { get; private set; } = 0f;
-    public float Happiness { get; private set; } = 100f;
 
-    /// <summary>
-    /// Constants for the fish's behavior and attributes, including maximum size, hunger rate, happiness loss/gain rates, and base speed.
-    /// </summary>
-    public const float MaxSize = 3f;
-    private const float HungerPerSecond = 2f;
-    private const float HungryThreshold = 60f;
-    private const float HappinessLossPerSecond = 3f;
-    private const float HappinessGainPerSecond = 1f;
-    private const float BaseSpeed = 60f;
-
-    /// <summary>
-    /// Movement of the fih 
-    /// </summary>
-    private Vector2f targetPosition;
-    private bool isFacingRight = true;
-    private float restTimeLeft;
-
-    /// <summary>
-    /// Placeholder for the sprite
-    /// </summary>
-    private readonly CircleShape bodyShape = new(10f);
-    private readonly ConvexShape tailShape = new(3);
-
-    /// <summary>
-    /// Aquarium (all the fish live here, so system.cs only needs one call)
-    /// </summary>
-    private const int StartingFishCount = 5;
-    private static readonly List<Fish> allFish = new();
-    private static readonly Clock frameClock = new();
-    private static bool isAquariumCreated = false;
-
-    public Fish(Vector2f startPosition) : base(startPosition)
+    public class Fish : Component
     {
-        targetPosition = startPosition;
-        allFish.Add(this);
+        private static readonly Random random = new();
 
-        bodyShape.Origin = new Vector2f(10f, 10f);
-        bodyShape.FillColor = new Color(255, 140, 0);
-        tailShape.SetPoint(0, new Vector2f(0f, 0f));
-        tailShape.SetPoint(1, new Vector2f(-14f, -9f));
-        tailShape.SetPoint(2, new Vector2f(-14f, 9f));
-        tailShape.FillColor = new Color(255, 100, 0);
-    }
+        /// <summary>
+        /// Attributes of the Fih
+        /// </summary>
+        public float Size { get; private set; } = 1f;
+        public float Hunger { get; private set; } = 0f;
+        public float Happiness { get; private set; } = 100f;
 
-    /// <summary>
-    /// Call this once per frame from system.cs (between Clear and Display)
-    /// </summary>
-    /// <param name="window"></param>
-    public static void UpdateAndDrawAll(RenderWindow window)
-    {
-        if (!isAquariumCreated)
+        /// <summary>
+        /// Constants for the fish's behavior and attributes, including maximum size, hunger rate, happiness loss/gain rates, and base speed.
+        /// </summary>
+        public const float MaxSize = 3f;
+        private const float HungerPerSecond = 2f;
+        private const float HungryThreshold = 60f;
+        private const float HappinessLossPerSecond = 3f;
+        private const float HappinessGainPerSecond = 1f;
+        private const float BaseSpeed = 60f;
+
+        /// <summary>
+        /// Movement of the fih 
+        /// </summary>
+        private Vector2f targetPosition;
+        private bool isFacingRight = true;
+        private float restTimeLeft;
+
+        /// <summary>
+        /// Placeholder for the sprite
+        /// </summary>
+        private readonly CircleShape bodyShape = new(10f);
+        private readonly ConvexShape tailShape = new(3);
+
+        /// <summary>
+        /// Aquarium (all the fish live here, so system.cs only needs one call)
+        /// </summary>
+        private const int StartingFishCount = 5;
+        private static readonly List<Fish> allFish = new();
+        private static readonly Clock frameClock = new();
+        private static bool isAquariumCreated = false;
+
+        public Fish(Vector2f startPosition) : base(startPosition)
         {
-            CreateAquarium(window);
+            targetPosition = startPosition;
+            allFish.Add(this);
+
+            bodyShape.Origin = new Vector2f(10f, 10f);
+            bodyShape.FillColor = new Color(255, 140, 0);
+            tailShape.SetPoint(0, new Vector2f(0f, 0f));
+            tailShape.SetPoint(1, new Vector2f(-14f, -9f));
+            tailShape.SetPoint(2, new Vector2f(-14f, 9f));
+            tailShape.FillColor = new Color(255, 100, 0);
         }
 
-        float deltaTime = frameClock.Restart().AsSeconds();
-        FloatRect tankBounds = new FloatRect(
-            new Vector2f(0f, 0f),
-            new Vector2f(window.Size.X, window.Size.Y)
-        );
-
-        /// Updates and draws every Component (fish now, other things later)
-        UpdateAndDrawAllComponents(deltaTime, tankBounds, window);
-    }
-
-    /// <summary>
-    /// Spawns the fish and sets up the F key (feed all)
-    /// </summary>
-    /// <param name="window"></param>
-    private static void CreateAquarium(RenderWindow window)
-    {
-        for (int i = 0; i < StartingFishCount; i++)
+        /// <summary>
+        /// Call this once per frame from system.cs (between Clear and Display)
+        /// </summary>
+        /// <param name="window"></param>
+        public static void UpdateAndDrawAll(RenderWindow window)
         {
-            float x = random.Next(50, (int)window.Size.X - 50);
-            float y = random.Next(50, (int)window.Size.Y - 50);
-            new Fish(new Vector2f(x, y));
-        }
-
-        window.KeyPressed += (sender, e) =>
-        {
-            if (e.Code == Keyboard.Key.F)
+            if (!isAquariumCreated)
             {
-                foreach (Fish fish in allFish)
-                {
-                    fish.Feed();
-                }
+                CreateAquarium(window);
             }
-        };
 
-        frameClock.Restart();
-        isAquariumCreated = true;
-    }
+            float deltaTime = frameClock.Restart().AsSeconds();
+            FloatRect tankBounds = new FloatRect(
+                new Vector2f(0f, 0f),
+                new Vector2f(window.Size.X, window.Size.Y)
+            );
 
-    /// <summary>
-    /// Update the fish's hunger, happiness, and movement based on the elapsed time and tank boundaries.
-    /// </summary>
-
-    public override void Update(float deltaTime, FloatRect tankBounds)
-    {
-        if (!IsAlive) return;
-
-        UpdateNeeds(deltaTime);
-        UpdateMovement(deltaTime, tankBounds);
-    }
-
-    private void UpdateNeeds(float deltaTime)
-    {
-        Hunger = Math.Min(100f, Hunger + HungerPerSecond * deltaTime);
-
-        if (Hunger >= HungryThreshold)
-            Happiness -= HappinessLossPerSecond * deltaTime;
-        else
-            Happiness += HappinessGainPerSecond * deltaTime;
-
-        Happiness = Math.Clamp(Happiness, 0f, 100f);
-
-        if (Hunger >= 100f) IsAlive = false; // starved
-    }
-
-    private void UpdateMovement(float deltaTime, FloatRect tankBounds)
-    {
-        if (restTimeLeft > 0f)
-        {
-            restTimeLeft -= deltaTime;
-            return;
+            /// Updates and draws every Component (fish now, other things later)
+            UpdateAndDrawAllComponents(deltaTime, tankBounds, window);
         }
 
-        Vector2f toTarget = targetPosition - Position;
-        float distance = MathF.Sqrt(toTarget.X * toTarget.X + toTarget.Y * toTarget.Y);
-
-        if (distance < 4f)
+        /// <summary>
+        /// Spawns the fish and sets up the F key (feed all)
+        /// </summary>
+        /// <param name="window"></param>
+        private static void CreateAquarium(RenderWindow window)
         {
-            PickNewTarget(tankBounds);
-            restTimeLeft = (float)(random.NextDouble() * 1.5);
-            return;
+            for (int i = 0; i < StartingFishCount; i++)
+            {
+                float x = random.Next(50, (int)window.Size.X - 50);
+                float y = random.Next(50, (int)window.Size.Y - 50);
+                new Fish(new Vector2f(x, y));
+            }
+
+            window.KeyPressed += (sender, e) =>
+            {
+                if (e.Code == Keyboard.Key.F)
+                {
+                    foreach (Fish fish in allFish)
+                    {
+                        fish.Feed();
+                    }
+                }
+            };
+
+            frameClock.Restart();
+            isAquariumCreated = true;
         }
-        float speed = BaseSpeed * (0.5f + Happiness / 200f);
-        Vector2f direction = toTarget / distance;
-        Position += direction * speed * deltaTime;
 
-        if (MathF.Abs(direction.X) > 0.05f)
-            isFacingRight = direction.X > 0f;
-    }
-    private void PickNewTarget(FloatRect tankBounds)
-    {
-        const float margin = 30f;
-        float x = tankBounds.Position.X + margin + (float)random.NextDouble() * (tankBounds.Size.X - margin * 2);
-        float y = tankBounds.Position.Y + margin + (float)random.NextDouble() * (tankBounds.Size.Y - margin * 2);
-        targetPosition = new Vector2f(x, y);
-    }
+        /// <summary>
+        /// Update the fish's hunger, happiness, and movement based on the elapsed time and tank boundaries.
+        /// </summary>
 
-    /// <summary>
-    /// Actions the fish can do (feed, sell, etc)
-    /// </summary>
+        public override void Update(float deltaTime, FloatRect tankBounds)
+        {
+            if (!IsAlive) return;
 
-    public void Feed(float amount = 40f)
-    {
-        if (!IsAlive) return;
-        Hunger = Math.Max(0f, Hunger - amount);
-        Size = Math.Min(MaxSize, Size + 0.1f);
-        Happiness = Math.Min(100f, Happiness + 5f);
-    }
+            UpdateNeeds(deltaTime);
+            UpdateMovement(deltaTime, tankBounds);
+        }
 
-    public int GetSellPrice() => (int)(10 * Size);
+        private void UpdateNeeds(float deltaTime)
+        {
+            Hunger = Math.Min(100f, Hunger + HungerPerSecond * deltaTime);
 
-    /// <summary>
-    /// Drawing the Fih
-    /// </summary>
-    public override void Draw(RenderWindow window)
-    {
-        if (!IsAlive) return;
+            if (Hunger >= HungryThreshold)
+                Happiness -= HappinessLossPerSecond * deltaTime;
+            else
+                Happiness += HappinessGainPerSecond * deltaTime;
 
-        float direction = isFacingRight ? 1f : -1f;
+            Happiness = Math.Clamp(Happiness, 0f, 100f);
 
-        bodyShape.Position = Position;
-        bodyShape.Scale = new Vector2f(1.6f * Size * direction, Size);
+            if (Hunger >= 100f) IsAlive = false; // starved
+        }
 
-        tailShape.Position = Position + new Vector2f(-direction * 14f * Size, 0f);
-        tailShape.Scale = new Vector2f(Size * direction, Size);
+        private void UpdateMovement(float deltaTime, FloatRect tankBounds)
+        {
+            if (restTimeLeft > 0f)
+            {
+                restTimeLeft -= deltaTime;
+                return;
+            }
 
-        window.Draw(tailShape);
-        window.Draw(bodyShape);
+            Vector2f toTarget = targetPosition - Position;
+            float distance = MathF.Sqrt(toTarget.X * toTarget.X + toTarget.Y * toTarget.Y);
+
+            if (distance < 4f)
+            {
+                PickNewTarget(tankBounds);
+                restTimeLeft = (float)(random.NextDouble() * 1.5);
+                return;
+            }
+            float speed = BaseSpeed * (0.5f + Happiness / 200f);
+            Vector2f direction = toTarget / distance;
+            Position += direction * speed * deltaTime;
+
+            if (MathF.Abs(direction.X) > 0.05f)
+                isFacingRight = direction.X > 0f;
+        }
+        private void PickNewTarget(FloatRect tankBounds)
+        {
+            const float margin = 30f;
+            float x = tankBounds.Position.X + margin + (float)random.NextDouble() * (tankBounds.Size.X - margin * 2);
+            float y = tankBounds.Position.Y + margin + (float)random.NextDouble() * (tankBounds.Size.Y - margin * 2);
+            targetPosition = new Vector2f(x, y);
+        }
+
+        /// <summary>
+        /// Actions the fish can do (feed, sell, etc)
+        /// </summary>
+
+        public void Feed(float amount = 40f)
+        {
+            if (!IsAlive) return;
+            Hunger = Math.Max(0f, Hunger - amount);
+            Size = Math.Min(MaxSize, Size + 0.1f);
+            Happiness = Math.Min(100f, Happiness + 5f);
+        }
+
+        public int GetSellPrice() => (int)(10 * Size);
+
+        /// <summary>
+        /// Drawing the Fih
+        /// </summary>
+        public override void Draw(RenderWindow window)
+        {
+            if (!IsAlive) return;
+
+            float direction = isFacingRight ? 1f : -1f;
+
+            bodyShape.Position = Position;
+            bodyShape.Scale = new Vector2f(1.6f * Size * direction, Size);
+
+            tailShape.Position = Position + new Vector2f(-direction * 14f * Size, 0f);
+            tailShape.Scale = new Vector2f(Size * direction, Size);
+
+            window.Draw(tailShape);
+            window.Draw(bodyShape);
+        }
+
+        public override void Start()
+        {
+            base.Start();
+        }
+
+        public override void Update()
+        {
+            base.Update();
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+        }
     }
 }

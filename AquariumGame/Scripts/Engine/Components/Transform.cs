@@ -13,14 +13,14 @@ namespace AquariumGame.Scripts.Engine.Components
         /// <summary>
         /// The posision of this FObject relative to its parent's
         /// </summary>
-        public Vector2f position;
+        public Vector2f position = (0, 0);
         /// <summary>
         /// The rotation of this FObject relative to its parent's 
         /// </summary>
-        public float rotation;
+        public float rotation = 0;
         /// <summary>
         /// The scale of this FObject relative to its parent's
         /// </summary>
-        public Vector2f scale;
+        public Vector2f scale = (0, 0);
     }
 }

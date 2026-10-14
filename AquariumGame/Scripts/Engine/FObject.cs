@@ -16,7 +16,7 @@ namespace AquariumGame.Scripts.Engine
         /// The parent of this FObject
         /// If this object is the root object, the parent will be itself
         /// </summary>
-        public FObject parent;
+        public FObject? parent = null;
         public List<FObject> children = [];
         /// <summary>
         /// The Transform component of this FObjects
