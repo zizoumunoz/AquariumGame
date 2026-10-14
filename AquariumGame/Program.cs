@@ -6,9 +6,11 @@ class Program
 {
     static void Main()
     {
-        RenderWindow window = new RenderWindow(
-            new VideoMode((800, 600)),
-            "My First SFML Game"
+        RenderWindow window = new(
+            VideoMode.DesktopMode,
+            "My First SFML Game",
+            Styles.Resize,
+            State.Fullscreen
         );
 
         window.Closed += (sender, e) =>
@@ -23,7 +25,7 @@ class Program
             window.DispatchEvents();
 
             window.Clear(Color.White);
-
+            
             window.Display();
         }
     }
