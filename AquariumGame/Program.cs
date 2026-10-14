@@ -21,9 +21,7 @@ class Program
         while (window.IsOpen)
         {
             window.DispatchEvents();
-
             window.Clear(Color.White);
-
             window.Display();
         }
     }
