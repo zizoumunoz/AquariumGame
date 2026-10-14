@@ -6,8 +6,7 @@ using SFML.Window;
 /// Represents a fish in the aquarium game, with attributes for size, hunger, happiness, and movement.
 /// </summary>
 
-// You need to put this to try the fish in Program.cs   Fish.UpdateAndDrawAll(window);
-public class Fish
+public class Fish : Component
 {
     private static readonly Random random = new();
 
@@ -15,7 +14,6 @@ public class Fish
     public float Size { get; private set; } = 1f;
     public float Hunger { get; private set; } = 0f;
     public float Happiness { get; private set; } = 100f;
-    public bool IsAlive { get; private set; } = true;
 
     // Tuning 
     public const float MaxSize = 3f;
@@ -26,7 +24,6 @@ public class Fish
     private const float BaseSpeed = 60f;
 
     // Movement 
-    public Vector2f Position { get; private set; }
     private Vector2f targetPosition;
     private bool isFacingRight = true;
     private float restTimeLeft;
@@ -41,10 +38,10 @@ public class Fish
     private static readonly Clock frameClock = new();
     private static bool isAquariumCreated = false;
 
-    public Fish(Vector2f startPosition)
+    public Fish(Vector2f startPosition) : base(startPosition)
     {
-        Position = startPosition;
         targetPosition = startPosition;
+        allFish.Add(this);
 
         bodyShape.Origin = new Vector2f(10f, 10f);
         bodyShape.FillColor = new Color(255, 140, 0);
@@ -68,11 +65,8 @@ public class Fish
             new Vector2f(window.Size.X, window.Size.Y)
         );
 
-        foreach (Fish fish in allFish)
-        {
-            fish.Update(deltaTime, tankBounds);
-            fish.Draw(window);
-        }
+        // Updates and draws every Component (fish now, other things later)
+        UpdateAndDrawAllComponents(deltaTime, tankBounds, window);
     }
 
     // Spawns the fish and sets up the F key (feed all)
@@ -82,7 +76,7 @@ public class Fish
         {
             float x = random.Next(50, (int)window.Size.X - 50);
             float y = random.Next(50, (int)window.Size.Y - 50);
-            allFish.Add(new Fish(new Vector2f(x, y)));
+            new Fish(new Vector2f(x, y));
         }
 
         window.KeyPressed += (sender, e) =>
@@ -101,7 +95,7 @@ public class Fish
     }
 
     // Update 
-    public void Update(float deltaTime, FloatRect tankBounds)
+    public override void Update(float deltaTime, FloatRect tankBounds)
     {
         if (!IsAlive) return;
 
@@ -169,7 +163,7 @@ public class Fish
     public int GetSellPrice() => (int)(10 * Size);
 
     // Drawing
-    public void Draw(RenderWindow window)
+    public override void Draw(RenderWindow window)
     {
         if (!IsAlive) return;
 
