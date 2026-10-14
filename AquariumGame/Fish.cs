@@ -1,0 +1,132 @@
+﻿using SFML.Graphics;
+using SFML.System;
+
+/// <summary>
+/// Represents a fish in the aquarium game, with attributes for size, hunger, happiness, and movement.
+/// </summary>
+public class Fish
+{
+    private static readonly Random random = new();
+
+    // Attributes 
+    public float Size { get; private set; } = 1f;        
+    public float Hunger { get; private set; } = 0f;     
+    public float Happiness { get; private set; } = 100f; 
+    public bool IsAlive { get; private set; } = true;
+
+    // Tuning 
+    public const float MaxSize = 3f;
+    private const float HungerPerSecond = 2f;
+    private const float HungryThreshold = 60f;
+    private const float HappinessLossPerSecond = 3f;
+    private const float HappinessGainPerSecond = 1f;
+    private const float BaseSpeed = 60f; 
+
+    // Movement 
+    public Vector2f Position { get; private set; }
+    private Vector2f targetPosition;
+    private bool isFacingRight = true;
+    private float restTimeLeft;
+
+    // Placeholder for the sprite
+    private readonly CircleShape bodyShape = new(10f);
+    private readonly ConvexShape tailShape = new(3);
+
+    public Fish(Vector2f startPosition)
+    {
+        Position = startPosition;
+        targetPosition = startPosition;
+
+        bodyShape.Origin = new Vector2f(10f, 10f);
+        bodyShape.FillColor = new Color(255, 140, 0);
+        tailShape.SetPoint(0, new Vector2f(0f, 0f));
+        tailShape.SetPoint(1, new Vector2f(-14f, -9f));
+        tailShape.SetPoint(2, new Vector2f(-14f, 9f));
+        tailShape.FillColor = new Color(255, 100, 0);
+    }
+
+    // Update 
+    public void Update(float deltaTime, FloatRect tankBounds)
+    {
+        if (!IsAlive) return;
+
+        UpdateNeeds(deltaTime);
+        UpdateMovement(deltaTime, tankBounds);
+    }
+
+    private void UpdateNeeds(float deltaTime)
+    {
+        Hunger = Math.Min(100f, Hunger + HungerPerSecond * deltaTime);
+
+        if (Hunger >= HungryThreshold)
+            Happiness -= HappinessLossPerSecond * deltaTime;
+        else
+            Happiness += HappinessGainPerSecond * deltaTime;
+
+        Happiness = Math.Clamp(Happiness, 0f, 100f);
+
+        if (Hunger >= 100f) IsAlive = false; // starved
+    }
+
+    private void UpdateMovement(float deltaTime, FloatRect tankBounds)
+    {
+        if (restTimeLeft > 0f)
+        {
+            restTimeLeft -= deltaTime;
+            return;
+        }
+
+        Vector2f toTarget = targetPosition - Position;
+        float distance = MathF.Sqrt(toTarget.X * toTarget.X + toTarget.Y * toTarget.Y);
+
+        if (distance < 4f)
+        {
+            PickNewTarget(tankBounds);
+            restTimeLeft = (float)(random.NextDouble() * 1.5); 
+            return;
+        }
+
+        // Unhappy fish swim slower
+        float speed = BaseSpeed * (0.5f + Happiness / 200f);
+        Vector2f direction = toTarget / distance;
+        Position += direction * speed * deltaTime;
+
+        if (MathF.Abs(direction.X) > 0.05f)
+            isFacingRight = direction.X > 0f;
+    }
+    private void PickNewTarget(FloatRect tankBounds)
+    {
+        const float margin = 30f;
+        float x = tankBounds.Position.X + margin + (float)random.NextDouble() * (tankBounds.Size.X - margin * 2);
+        float y = tankBounds.Position.Y + margin + (float)random.NextDouble() * (tankBounds.Size.Y - margin * 2);
+        targetPosition = new Vector2f(x, y);
+    }
+
+    // Actions 
+    public void Feed(float amount = 40f)
+    {
+        if (!IsAlive) return;
+        Hunger = Math.Max(0f, Hunger - amount);
+        Size = Math.Min(MaxSize, Size + 0.1f);
+        Happiness = Math.Min(100f, Happiness + 5f);
+    }
+
+    public int GetSellPrice() => (int)(10 * Size);
+
+    // Drawing
+    public void Draw(RenderWindow window)
+    {
+        if (!IsAlive) return;
+
+        float direction = isFacingRight ? 1f : -1f;
+
+        bodyShape.Position = Position;
+        bodyShape.Scale = new Vector2f(1.6f * Size * direction, Size);
+
+        tailShape.Position = Position + new Vector2f(-direction * 14f * Size, 0f);
+        tailShape.Scale = new Vector2f(Size * direction, Size);
+
+        window.Draw(tailShape);
+        window.Draw(bodyShape);
+    }
+}
