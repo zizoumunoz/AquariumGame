@@ -18,14 +18,18 @@ public abstract class Component
         Position = startPosition;
         allComponents.Add(this);
     }
-    // Every child class must define how it updates and how it is drawn
+    /// <summary>
+    /// Every child class must define how it updates and how it is drawn
+    /// </summary>
     public abstract void Update(float deltaTime, FloatRect tankBounds);
     public abstract void Draw(RenderWindow window);
 
-    // Updates and draws every component that exists
+    /// <summary>
+    /// Updates and draws every component that exists
+    /// </summary>
     public static void UpdateAndDrawAllComponents(float deltaTime, FloatRect tankBounds, RenderWindow window)
     {
-        // Normal for loop, so components can be added while looping 
+        /// Normal for loop, so components can be added while looping 
         for (int i = 0; i < allComponents.Count; i++)
         {
             allComponents[i].Update(deltaTime, tankBounds);

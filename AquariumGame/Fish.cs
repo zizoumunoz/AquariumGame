@@ -10,12 +10,16 @@ public class Fish : Component
 {
     private static readonly Random random = new();
 
-    // Attributes 
+    /// <summary>
+    /// Attributes of the Fih
+    /// </summary>
     public float Size { get; private set; } = 1f;
     public float Hunger { get; private set; } = 0f;
     public float Happiness { get; private set; } = 100f;
 
-    // Tuning 
+    /// <summary>
+    /// Constants for the fish's behavior and attributes, including maximum size, hunger rate, happiness loss/gain rates, and base speed.
+    /// </summary>
     public const float MaxSize = 3f;
     private const float HungerPerSecond = 2f;
     private const float HungryThreshold = 60f;
@@ -23,16 +27,22 @@ public class Fish : Component
     private const float HappinessGainPerSecond = 1f;
     private const float BaseSpeed = 60f;
 
-    // Movement 
+    /// <summary>
+    /// Movement of the fih 
+    /// </summary>
     private Vector2f targetPosition;
     private bool isFacingRight = true;
     private float restTimeLeft;
 
-    // Placeholder for the sprite
+    /// <summary>
+    /// Placeholder for the sprite
+    /// </summary>
     private readonly CircleShape bodyShape = new(10f);
     private readonly ConvexShape tailShape = new(3);
 
-    // Aquarium (all the fish live here, so system.cs only needs one call)
+    /// <summary>
+    /// Aquarium (all the fish live here, so system.cs only needs one call)
+    /// </summary>
     private const int StartingFishCount = 5;
     private static readonly List<Fish> allFish = new();
     private static readonly Clock frameClock = new();
@@ -51,7 +61,10 @@ public class Fish : Component
         tailShape.FillColor = new Color(255, 100, 0);
     }
 
-    // Call this once per frame from system.cs (between Clear and Display)
+    /// <summary>
+    /// Call this once per frame from system.cs (between Clear and Display)
+    /// </summary>
+    /// <param name="window"></param>
     public static void UpdateAndDrawAll(RenderWindow window)
     {
         if (!isAquariumCreated)
@@ -65,11 +78,14 @@ public class Fish : Component
             new Vector2f(window.Size.X, window.Size.Y)
         );
 
-        // Updates and draws every Component (fish now, other things later)
+        /// Updates and draws every Component (fish now, other things later)
         UpdateAndDrawAllComponents(deltaTime, tankBounds, window);
     }
 
-    // Spawns the fish and sets up the F key (feed all)
+    /// <summary>
+    /// Spawns the fish and sets up the F key (feed all)
+    /// </summary>
+    /// <param name="window"></param>
     private static void CreateAquarium(RenderWindow window)
     {
         for (int i = 0; i < StartingFishCount; i++)
@@ -94,7 +110,10 @@ public class Fish : Component
         isAquariumCreated = true;
     }
 
-    // Update 
+    /// <summary>
+    /// Update the fish's hunger, happiness, and movement based on the elapsed time and tank boundaries.
+    /// </summary>
+
     public override void Update(float deltaTime, FloatRect tankBounds)
     {
         if (!IsAlive) return;
@@ -134,8 +153,6 @@ public class Fish : Component
             restTimeLeft = (float)(random.NextDouble() * 1.5);
             return;
         }
-
-        // Unhappy fish swim slower
         float speed = BaseSpeed * (0.5f + Happiness / 200f);
         Vector2f direction = toTarget / distance;
         Position += direction * speed * deltaTime;
@@ -151,7 +168,10 @@ public class Fish : Component
         targetPosition = new Vector2f(x, y);
     }
 
-    // Actions 
+    /// <summary>
+    /// Actions the fish can do (feed, sell, etc)
+    /// </summary>
+
     public void Feed(float amount = 40f)
     {
         if (!IsAlive) return;
@@ -162,7 +182,9 @@ public class Fish : Component
 
     public int GetSellPrice() => (int)(10 * Size);
 
-    // Drawing
+    /// <summary>
+    /// Drawing the Fih
+    /// </summary>
     public override void Draw(RenderWindow window)
     {
         if (!IsAlive) return;
